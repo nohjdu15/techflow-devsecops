@@ -47,6 +47,11 @@ git checkout -b feature/infra-setup
 	- MY_SECRET
 	- AZURE_SERVICE_CONNECTION (nombre del service connection)
 
+Valores actuales:
+
+- AZURE_SERVICE_CONNECTION: sc-techflow-dev
+- Resource Group: rg-techflow-dev
+
 3) Crea el Service Principal
 
 - Crea un Service Principal con rol Contributor al scope de la suscripcion o RG

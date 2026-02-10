@@ -12,6 +12,7 @@ pr:
       - main
 
 variables:
+  AZURE_SERVICE_CONNECTION: sc-techflow-dev
   APP_IMAGE_NAME: techflow-app
   JOB_IMAGE_NAME: techflow-job
   TF_IN_AUTOMATION: "true"
