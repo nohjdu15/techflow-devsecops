@@ -1,0 +1,98 @@
+name: CI-CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  APP_IMAGE_NAME: techflow-app
+  JOB_IMAGE_NAME: techflow-job
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  build-scan-push-deploy:
+    runs-on: ubuntu-latest
+    env:
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ACR_NAME: ${{ secrets.ACR_NAME }}
+      ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+      MY_SECRET: ${{ secrets.MY_SECRET }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Build app image
+        run: |
+          docker build \
+            -t $ACR_LOGIN_SERVER/$APP_IMAGE_NAME:${{ github.sha }} \
+            ./app
+
+      - name: Build job image
+        run: |
+          docker build \
+            -t $ACR_LOGIN_SERVER/$JOB_IMAGE_NAME:${{ github.sha }} \
+            ./job
+
+      - name: Install Trivy
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
+      - name: Trivy scan images
+        run: |
+          trivy image --exit-code 1 --severity CRITICAL,HIGH $ACR_LOGIN_SERVER/$APP_IMAGE_NAME:${{ github.sha }}
+          trivy image --exit-code 1 --severity CRITICAL,HIGH $ACR_LOGIN_SERVER/$JOB_IMAGE_NAME:${{ github.sha }}
+
+      - name: Set up Python for Checkov
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Checkov
+        run: |
+          pip install checkov
+
+      - name: Checkov scan Terraform
+        run: |
+          checkov -d infra --quiet
+
+      - name: ACR login
+        run: |
+          az acr login --name $ACR_NAME
+
+      - name: Push images
+        run: |
+          docker push $ACR_LOGIN_SERVER/$APP_IMAGE_NAME:${{ github.sha }}
+          docker push $ACR_LOGIN_SERVER/$JOB_IMAGE_NAME:${{ github.sha }}
+
+      - name: Terraform apply (only on main/develop)
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+        working-directory: infra
+        run: |
+          terraform init
+          terraform apply -auto-approve \
+            -var "secret_value=$MY_SECRET" \
+            -var "app_image_tag=${{ github.sha }}" \
+            -var "job_image_tag=${{ github.sha }}" 
