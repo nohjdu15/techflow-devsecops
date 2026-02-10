@@ -10,7 +10,7 @@ resource "random_string" "suffix" {
 
 locals {
   suffix          = random_string.suffix.result
-  rg_name         = "${var.prefix}-rg-${local.suffix}"
+  rg_name         = var.rg_name
   kv_name         = "${var.prefix}-kv-${local.suffix}"
   acr_name        = "${var.prefix}${local.suffix}"
   env_name        = "${var.prefix}-env-${local.suffix}"
@@ -62,7 +62,7 @@ module "container_app" {
   container_env_id       = module.containerapps_env.id
   image                  = local.app_image
   acr_login_server       = module.acr.login_server
-  key_vault_secret_id    = azurerm_key_vault_secret.app.id
+  key_vault_secret_id    = azurerm_key_vault_secret.app.versionless_id
   secret_name            = var.secret_name
   ingress_target_port    = 8000
 }
@@ -96,4 +96,12 @@ resource "azurerm_key_vault_access_policy" "app" {
   object_id    = module.container_app.identity_principal_id
 
   secret_permissions = ["Get", "List"]
+}
+
+resource "azurerm_key_vault_access_policy" "terraform_sp" {
+  key_vault_id = module.key_vault.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = data.azurerm_client_config.current.object_id
+
+  secret_permissions = ["Get", "List", "Set"]
 }

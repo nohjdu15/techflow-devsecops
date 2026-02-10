@@ -3,7 +3,7 @@ resource "azurerm_container_app_job" "this" {
   resource_group_name          = var.rg_name
   location                     = var.location
   container_app_environment_id = var.container_env_id
-  trigger_type                 = "Schedule"
+  replica_timeout_in_seconds   = 3600
 
   identity {
     type = "SystemAssigned"

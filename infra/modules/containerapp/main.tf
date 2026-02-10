@@ -10,13 +10,13 @@ resource "azurerm_container_app" "this" {
 
   registry {
     server   = var.acr_login_server
-    identity = "system"
+    identity = "System"
   }
 
   secret {
     name                  = var.secret_name
     key_vault_secret_id   = var.key_vault_secret_id
-    identity              = "system"
+    identity              = "System"
   }
 
   ingress {
@@ -30,7 +30,7 @@ resource "azurerm_container_app" "this" {
   }
 
   template {
-    init_containers {
+    init_container {
       name    = "init"
       image   = "alpine:3.19"
       command = ["sh", "-c", "echo Iniciando...; sleep 5"]

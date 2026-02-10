@@ -4,6 +4,12 @@ variable "location" {
   default     = "eastus"
 }
 
+variable "rg_name" {
+  type        = string
+  description = "Existing resource group name"
+  default     = "rg-techflow-dev"
+}
+
 variable "prefix" {
   type        = string
   description = "Prefix for resource names (alphanumeric, lowercase)"

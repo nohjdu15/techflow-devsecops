@@ -16,7 +16,6 @@ Solucion serverless con contenedores para una API critica. Incluye IaC con Terra
 - app/: API FastAPI
 - job/: Job de mantenimiento
 - infra/: Terraform modular
-- .github/workflows/: Pipeline CI/CD
 - PROMPTS.md: prompts usados
 
 ## Requisitos
@@ -115,6 +114,7 @@ python main.py
 - location: region (default eastus)
 - secret_value: valor del secreto (sensitive)
 - app_image_tag y job_image_tag: tags de imagen
+- rg_name: nombre del resource group (default rg-techflow-dev)
 
 ## CI/CD
 

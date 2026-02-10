@@ -14,4 +14,8 @@ terraform {
 
 provider "azurerm" {
   features {}
+
+  # El SP solo tiene permisos en el RG, no en la suscripcion.
+  # Evitamos que Terraform intente registrar proveedores a nivel suscripcion.
+  skip_provider_registration = true
 }
