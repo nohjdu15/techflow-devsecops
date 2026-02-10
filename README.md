@@ -118,6 +118,8 @@ python main.py
 
 ## CI/CD
 
+### Opcion 1: Azure DevOps
+
 Pipeline en [azure-pipelines.yml](azure-pipelines.yml):
 
 - Build Docker (app y job)
@@ -125,6 +127,17 @@ Pipeline en [azure-pipelines.yml](azure-pipelines.yml):
 - Checkov scan (Terraform)
 - Push a ACR
 - terraform apply (en pushes a develop/main)
+
+### Opcion 2: GitHub Actions
+
+Workflow en [.github/workflows/ci-cd.yml](.github/workflows/ci-cd.yml):
+
+- Trigger en push/PR a main, develop y feature/**
+- Build Docker (app y job) usando el tag `${{ github.sha }}`
+- Trivy scan (imagenes)
+- Checkov scan (Terraform)
+- Login en ACR y push de imagenes
+- terraform apply (solo en main/develop)
 
 ## Notas de seguridad
 
