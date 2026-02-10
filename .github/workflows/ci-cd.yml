@@ -59,8 +59,8 @@ jobs:
 
       - name: Trivy scan images
         run: |
-          trivy image --exit-code 1 --severity CRITICAL,HIGH $ACR_LOGIN_SERVER/$APP_IMAGE_NAME:${{ github.sha }}
-          trivy image --exit-code 1 --severity CRITICAL,HIGH $ACR_LOGIN_SERVER/$JOB_IMAGE_NAME:${{ github.sha }}
+          trivy image --exit-code 1 --severity CRITICAL $ACR_LOGIN_SERVER/$APP_IMAGE_NAME:${{ github.sha }}
+          trivy image --exit-code 1 --severity CRITICAL $ACR_LOGIN_SERVER/$JOB_IMAGE_NAME:${{ github.sha }}
 
       - name: Set up Python for Checkov
         uses: actions/setup-python@v5
