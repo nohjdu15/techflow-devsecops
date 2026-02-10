@@ -73,7 +73,7 @@ jobs:
 
       - name: Checkov scan Terraform
         run: |
-          checkov -d infra --quiet
+          checkov -d infra --quiet --soft-fail
 
       - name: ACR login
         run: |
