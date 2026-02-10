@@ -24,7 +24,7 @@ Solucion serverless con contenedores para una API critica. Incluye IaC con Terra
 - Azure CLI
 - Terraform >= 1.5
 - Docker
-- GitHub repo
+- Cuenta de GitHub (por ejemplo: https://github.com/nohjdu15)
 
 ## Paso a paso (Git Flow)
 
@@ -134,4 +134,4 @@ Pipeline en [azure-pipelines.yml](azure-pipelines.yml):
 
 ## URL del repositorio
 
-- Reemplaza este texto con la URL de tu repo una vez creado
+- Repositorio GitHub: https://github.com/nohjdu15/techflow-devsecops
